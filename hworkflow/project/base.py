@@ -89,7 +89,7 @@ class Project:
             if seq >= max_repeat:
                 break
 
-    def run_retry(self, row, max_retry=3):
+    def run_retry(self, row, max_retry=10):
         self.check_code(row)
 
         retry = 0
@@ -100,14 +100,19 @@ class Project:
                 error_log = read_text(log_file)
 
                 # Network error, resolve by retry
-                if "Socket closed" in error_log or "Connection reset by peer" in error_log:
+                possible_errors = [
+                    "Socket closed",
+                    "Connection timed out",
+                    "Connection reset by peer",
+                ]
+                if any(e in error_log for e in possible_errors):
                     retry += 1
                     time.sleep(30)
                     continue
-
-                # Unknown error, left to user
-                print(error_log)
-                break
+                else:
+                    # Unknown error, left to user
+                    print(error_log)
+                    break
 
             # Merge all log files include previous ones produced by runs with error
             log_files = eglob(".", f"train#*.log")
