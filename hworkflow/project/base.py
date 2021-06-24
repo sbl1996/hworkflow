@@ -4,6 +4,7 @@ import subprocess
 from itertools import dropwhile
 from typing import Tuple
 
+from github import GithubException
 from hhutil.io import fmt_path, read_lines, write_lines, read_text, eglob, rename
 
 from hworkflow.github import Github
@@ -55,9 +56,17 @@ class Project:
         name = f"{row}" if seq == 1 and not self._suffix1 else f"{row}-{seq}"
         return name
 
-    def push_log(self, log_name, content):
+    def push_log(self, log_name, content, max_retry=3):
         path = "log/" + log_name + ".log"
-        self._github.push(path, content)
+        try:
+            self._github.push(path, content)
+        except GithubException as e:
+            if max_retry > 0:
+                time.sleep(10)
+                self.push_log(log_name, content, max_retry - 1)
+            else:
+                raise e
+
 
     def sync_result(self, row, log_file):
         new_result = self.parse_log(log_file)
@@ -93,9 +102,11 @@ class Project:
         self.check_code(row)
 
         retry = 0
+        log_files = []
         while retry <= max_retry:
             log_file = f"train#{retry}.log"
             p = self.run_script(row, log_file)
+            log_files.append(log_file)
             if p.returncode != 0:
                 error_log = read_text(log_file)
 
@@ -115,7 +126,6 @@ class Project:
                     break
 
             # Merge all log files include previous ones produced by runs with error
-            log_files = eglob(".", f"train#*.log")
             lines = merge_log_files(log_files)
             log_file = f"{row}#m.log"
             write_lines(lines, log_file)
@@ -129,6 +139,7 @@ def merge_log_files(log_files):
     for log_file in log_files:
         lines = read_lines(log_file)
 
+        # Error messages are dropped for debugging
         drop_prefixes = [
             "WARNING",
             "Instructions for updating",
