@@ -113,9 +113,9 @@ class Project:
                 # Network error, resolve by retry
                 possible_errors = [
                     "Socket closed",
-                    "Connection timed out",
                     "Connection reset by peer",
                 ]
+                # TODO: Connection timed out. The process will not return and block forever.
                 if any(e in error_log for e in possible_errors):
                     retry += 1
                     time.sleep(30)
@@ -124,7 +124,9 @@ class Project:
                     # Unknown error, left to user
                     print(error_log)
                     break
-
+            previous_log = fmt_path("train#p.log")
+            if previous_log.exists():
+                log_files.insert(0, previous_log)
             # Merge all log files include previous ones produced by runs with error
             lines = merge_log_files(log_files)
             log_file = f"{row}#m.log"
