@@ -14,11 +14,13 @@
 ### Github
 - The repo access is granted by Github access token 
 - Get personal access token: [Creating a personal access token](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token)
+- In "Select scopes", choose "repo"
 
 ### Google Sheet
 - Sheets accesses are granted by credentials json file
-- Check this [guide](https://developers.google.com/sheets/api/quickstart/python#step_1_turn_on_the) for reference
-- The steps are listed below:
+- A Google Cloud Platform project with the API enabled. To create a project and enable an API, refer to [Create a project and enable the API](https://developers.google.com/workspace/guides/create-project)
+- Authorization credentials for a desktop application. To learn how to create credentials for a desktop application, refer to [Create credentials](https://developers.google.com/workspace/guides/create-credentials)
+- The detailed steps are listed below:
     - Create a GCP Project
     - Enable Google Sheets API in Dashboard of APIs and services
     - Configure OAuth consent screen of APIs and services (External is OK)
