@@ -1,5 +1,10 @@
 # ⒽWorkflow
 
+## Features
+- Automated and standardized deep learning experiment management 
+- Based on GitHub and Google Sheets, accesible for individual and team
+- Automatic experiment repeating, results synchronization and error recovery
+
 ## Concepts
 
 ### Github
