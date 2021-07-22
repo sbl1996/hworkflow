@@ -3,7 +3,7 @@
 ## Concepts
 
 ### Github
-- Create a Github repository to manage code and log.
+- Using repository to manage code and log.
 - Every project has a folder in the repo.
 
 ### Google Sheet
@@ -44,15 +44,14 @@
 
 - N Worker
 
-    Google Colab for training
+    Training on any workers
 
 ### User Workflow
 1. Add a row in Sheet
 2. Push code to Repo
+3. Wait for experiment result
 
 ### Worker Workflow
-
-1. Worker fetch pending task (code) from Sheet
-2. Worker complete training
-3. Worker push result to Sheet, log to Repo
-4. Repeat from 1
+1. Fetch code from Github
+2. Training
+3. Push result to Sheet and push log to Repo

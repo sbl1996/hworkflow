@@ -152,7 +152,7 @@ def merge_log_files(log_files):
         new_lines = []
         is_error_msg = False
         for l in lines:
-            if not is_error_msg and l.startswith("Traceback"):
+            if not is_error_msg and (l.startswith("Traceback") or "Unable to destroy remote tensor handles" in l):
                 is_error_msg = True
             if is_error_msg and l.endswith("Start training"):
                 is_error_msg = False
