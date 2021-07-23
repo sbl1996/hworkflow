@@ -67,7 +67,6 @@ class Project:
             else:
                 raise e
 
-
     def sync_result(self, row, log_file):
         new_result = self.parse_log(log_file)
         seq = self._sheet.append_result(
@@ -97,6 +96,37 @@ class Project:
             seq = self.sync_result(row, log_file)
             if seq >= max_repeat:
                 break
+
+    def run_retry2(self, row, max_retry=10):
+        self.check_code(row)
+
+        retry = 0
+        while retry <= max_retry:
+            log_file = f"train.log"
+            p = self.run_script(row, log_file)
+            if p.returncode != 0:
+                error_log = read_text(log_file)
+
+                # Network error, resolve by retry
+                possible_errors = [
+                    "Socket closed",
+                    "Connection reset by peer",
+                ]
+                # TODO: Connection timed out. The process will not return and block forever.
+                if any(e in error_log for e in possible_errors):
+                    retry += 1
+                    time.sleep(30)
+                    continue
+                else:
+                    # Unknown error, left to user
+                    print(error_log)
+                    break
+
+            lines = read_lines(log_file)
+            lines = list(dropwhile(lambda l: 'Start training' not in l, lines))
+            write_lines(lines, log_file)
+            self.sync_result(row, log_file)
+            break
 
     def run_retry(self, row, max_retry=10):
         self.check_code(row)
