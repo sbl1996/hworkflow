@@ -6,4 +6,4 @@ class CIFAR(Project):
     _sheet_ranges = ["K", "L", "M"]
     _update_methods = ["A", "A", "W"]
     _commit_range = 'O'
-    _repo_path = "hanser"
+    _dep_repo_path = "hanser"
