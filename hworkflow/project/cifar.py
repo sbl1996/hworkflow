@@ -2,5 +2,8 @@ from hworkflow.project.base import Project
 
 class CIFAR(Project):
     _parse_script = "hanser/tools/parse_cifar_log.py"
-    _sheet_range = ('K', 'M')
-    _sheet_update_last = False
+    # accs, losses, time
+    _sheet_ranges = ["K", "L", "M"]
+    _update_methods = ["A", "A", "W"]
+    _commit_range = 'O'
+    _repo_path = "hanser"
