@@ -79,7 +79,11 @@ class Project:
                 raise e
 
     def sync_result(self, row, log_file):
-        new_result = self.parse_log(log_file)
+        try:
+            new_result = self.parse_log(log_file)
+        except subprocess.CalledProcessError:
+            print(read_text(log_file))
+            raise ValueError("Log file parse error.")
         ranges = self._sheet_ranges
         update_methods = self._update_methods
         if self._commit_range is not None:
