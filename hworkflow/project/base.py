@@ -132,6 +132,7 @@ class Project:
                 possible_errors = [
                     "Socket closed",
                     "Connection reset by peer",
+                    "Stage end"
                 ]
                 # TODO: Connection timed out. The process will not return and block forever.
                 if any(e in error_log for e in possible_errors):

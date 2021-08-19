@@ -4,9 +4,9 @@ from hworkflow.project.base import Project
 class ImageNet(Project):
     _parse_script = "hanser/tools/parse_imagenet_log.py"
     # acc, acc5, loss, time
-    _sheet_ranges = ["K", "L", "M", "N"]
+    _sheet_ranges = ["L", "M", "N", "O"]
     _update_methods = ["A", "A", "A", "W"]
-    _commit_range = 'P'
+    _commit_range = 'Q'
     _dep_repo_path = "hanser"
     _log_suffix1 = False
 
