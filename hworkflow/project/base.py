@@ -96,7 +96,8 @@ class Project:
         log_name = self.get_log_name(row, seq)
         print(log_name)
         self.push_log(log_name, read_text(log_file))
-        copy(log_file, fmt_path(log_file).with_stem(log_name))
+        log_file = fmt_path(log_file)
+        copy(log_file, log_file.with_name(log_name + log_file.suffix))
         return seq
 
     def run_repeat(self, row, max_repeat=5):
