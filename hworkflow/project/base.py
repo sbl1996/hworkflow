@@ -5,7 +5,7 @@ from itertools import dropwhile
 from typing import List, Optional
 
 from github import GithubException
-from hhutil.io import fmt_path, read_lines, write_lines, read_text, eglob, rename
+from hhutil.io import fmt_path, read_lines, write_lines, read_text, rename, copy
 
 from hworkflow.github import Github
 from hworkflow.sheets import GoogleSheet
@@ -96,7 +96,7 @@ class Project:
         log_name = self.get_log_name(row, seq)
         print(log_name)
         self.push_log(log_name, read_text(log_file))
-        rename(log_file, log_name)
+        copy(log_file, fmt_path(log_file).with_stem(log_name))
         return seq
 
     def run_repeat(self, row, max_repeat=5):
