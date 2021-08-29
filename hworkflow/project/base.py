@@ -9,6 +9,7 @@ from hhutil.io import fmt_path, read_lines, write_lines, read_text, rename, copy
 
 from hworkflow.github import Github
 from hworkflow.sheets import GoogleSheet
+from hworkflow.utils import retry_fn
 
 
 class Project:
@@ -115,9 +116,13 @@ class Project:
             lines = list(dropwhile(lambda l: 'Start training' not in l, lines))
             write_lines(lines, log_file)
 
-            seq = self.sync_result(row, log_file)
+            seq = retry_fn(lambda: self.sync_result(row, log_file), 3,
+                           catch=(BrokenPipeError,), interval=10)
+            # seq = self.sync_result(row, log_file)
+
             if seq >= max_repeat:
                 break
+
 
     def run_retry(self, row, max_retry=10):
         self.check_code(row)
@@ -148,7 +153,9 @@ class Project:
             lines = read_lines(log_file)
             lines = list(dropwhile(lambda l: 'Start training' not in l, lines))
             write_lines(lines, log_file)
-            self.sync_result(row, log_file)
+
+            retry_fn(lambda: self.sync_result(row, log_file), 3,
+                     catch=(BrokenPipeError,), interval=10)
             break
 
     def run_retry2(self, row, max_retry=10):

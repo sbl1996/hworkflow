@@ -1,5 +1,7 @@
+from typing import Tuple, Type
 import os
 import base64
+import time
 from datetime import datetime
 
 from dateutil.parser import parse
@@ -45,3 +47,19 @@ def encode_script(script: str):
 
 def decode_script(encoded_scirpt):
     return base64.b64decode(encoded_scirpt.encode()).decode()
+
+
+def retry_fn(fn, max_retry, catch: Tuple[Type[Exception], ...], interval=None):
+    i = 0
+    while True:
+        try:
+            ret = fn()
+            return ret
+        except Exception as e:
+            if not isinstance(e, catch):
+                raise e
+            i += 1
+            if i >= max_retry:
+                raise e
+            if interval is not None:
+                time.sleep(interval)
