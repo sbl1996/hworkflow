@@ -21,7 +21,7 @@ class Project:
     _commit_range: Optional[str] = None
     _dep_repo_path: Optional[str] = None
 
-    def __init__(self, name, git_repo, sheet_id, access_token, secret_file, token_file, worker_id=0):
+    def __init__(self, name, git_repo, sheet_id, access_token, secret_file, token_file, worker_id=0, **env_vars):
         super().__init__()
         assert len(self._sheet_ranges) == len(self._update_methods)
         if self._commit_range is not None:
@@ -31,6 +31,7 @@ class Project:
         self._github = Github(git_repo, name, access_token)
         self._sheet = GoogleSheet(sheet_id, secret_file, token_file)
         self._worker_id = worker_id
+        self._env_vars = env_vars
 
         self._python_exe = sys.executable
 
@@ -48,6 +49,7 @@ class Project:
             "WORKER_ID": self._worker_id,
             "TASK_NAME": self._name,
             "TASK_ID": row,
+            **self._env_vars,
         }
         python_exe = self._python_exe
         env_prefix = " ".join([f"{k}={v}" for k, v in envs.items()])
