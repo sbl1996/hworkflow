@@ -131,7 +131,6 @@ class Project:
             if seq >= max_repeat:
                 break
 
-
     def run_retry(self, row, max_retry=10):
         self.check_code(row)
 
@@ -181,6 +180,7 @@ class Project:
                     "Connection reset by peer",
                     "Stage end",
                     "Infinite encountered",
+                    "Killed", # local memory usage exceeded
                 ]
                 # TODO: Connection timed out. The process will not return and block forever.
                 if any(e in error_log for e in possible_errors):
