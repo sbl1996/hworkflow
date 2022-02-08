@@ -34,9 +34,9 @@ class GoogleSheet:
     def read_values(self, ranges, sheet='Sheet1'):
         r"""
         Examples::
-            >>> self.read_values('K121:L121')
+            >>> self.read_values('L121:M121')
             >>> ['79.17', '94.29']
-            >>> self.read_values(['K121', 'L121'])
+            >>> self.read_values(['L121', 'M121'])
             >>> [['79.17'], ['94.29']]
             >>>
             >>> self.read_values(['K120', 'L120', "M120", "N120", "O120"])

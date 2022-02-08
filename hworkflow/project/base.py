@@ -3,6 +3,7 @@ import time
 import subprocess
 from itertools import dropwhile
 from typing import List, Optional
+import pkg_resources
 
 from github import GithubException
 from hhutil.io import fmt_path, read_lines, write_lines, read_text, rename, copy
@@ -19,14 +20,19 @@ class Project:
     _update_methods: List[str]
     _log_suffix1: bool = True
     _commit_range: Optional[str] = None
-    _dep_repo_path: Optional[str] = None
+    _dep_repo: Optional[str] = None
 
     def __init__(self, name, git_repo, sheet_id, access_token, secret_file, token_file, worker_id=0, **env_vars):
         super().__init__()
         assert len(self._sheet_ranges) == len(self._update_methods)
+        self._parse_script_path = self._parse_script
         if self._commit_range is not None:
-            assert self._dep_repo_path is not None
-            assert fmt_path(self._dep_repo_path).exists()
+            assert self._dep_repo is not None
+        if self._dep_repo is not None:
+            self._dep_repo_path = pkg_resources.get_distribution(self._dep_repo).module_path
+            if self._parse_script.startswith("$" + self._dep_repo):
+                self._parse_script_path = self._parse_script.replace(
+                    "$" + self._dep_repo, self._dep_repo_path)
         self._name = name
         self._github = Github(git_repo, name, access_token)
         self._sheet = GoogleSheet(sheet_id, secret_file, token_file)
@@ -63,7 +69,7 @@ class Project:
 
     def parse_log(self, log_file):
         result = subprocess.check_output(
-            f"{self._python_exe} {self._parse_script} -f {log_file}", shell=True).decode().split()
+            f"{self._python_exe} {self._parse_script_path} -f {log_file}", shell=True).decode().split()
         return result
 
     def get_log_name(self, row, seq):
