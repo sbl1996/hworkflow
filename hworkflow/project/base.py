@@ -50,16 +50,16 @@ class Project:
         content = self._github.fetch(f"code/{row}.py")
         fmt_path(f"{row}.py").write_text(content)
 
-    def run_script(self, row, log_file):
+    def run_script(self, name, log_file):
         envs = {
             "WORKER_ID": self._worker_id,
             "TASK_NAME": self._name,
-            "TASK_ID": row,
+            "TASK_ID": name,
             **self._env_vars,
         }
         python_exe = self._python_exe
         env_prefix = " ".join([f"{k}={v}" for k, v in envs.items()])
-        cmd = f"{env_prefix} {python_exe} -u {row}.py > {log_file} 2>&1"
+        cmd = f"{env_prefix} {python_exe} -u {name}.py > {log_file} 2>&1"
 
         p = subprocess.run(cmd, shell=True)
         return p
@@ -146,7 +146,8 @@ class Project:
                 possible_errors = [
                     "Socket closed",
                     "Connection reset by peer",
-                    "Stage end"
+                    "Stage end",
+                    "Infinite encountered",
                 ]
                 # TODO: Connection timed out. The process will not return and block forever.
                 if any(e in error_log for e in possible_errors):
@@ -164,6 +165,36 @@ class Project:
 
             retry_fn(lambda: self.sync_result(row, log_file), 3,
                      catch=(BrokenPipeError,), interval=10)
+            break
+
+    def _run_retry(self, name, max_retry=10):
+        retry = 0
+        while retry <= max_retry:
+            log_file = f"train.log"
+            p = self.run_script(name, log_file)
+            if p.returncode != 0:
+                error_log = read_text(log_file)
+
+                # Network error, resolve by retry
+                possible_errors = [
+                    "Socket closed",
+                    "Connection reset by peer",
+                    "Stage end",
+                    "Infinite encountered",
+                ]
+                # TODO: Connection timed out. The process will not return and block forever.
+                if any(e in error_log for e in possible_errors):
+                    retry += 1
+                    time.sleep(30)
+                    continue
+                else:
+                    # Unknown error, left to user
+                    print(error_log)
+                    break
+
+            lines = read_lines(log_file)
+            lines = list(dropwhile(lambda l: 'Start training' not in l, lines))
+            write_lines(lines, log_file)
             break
 
     def run_retry2(self, row, max_retry=10):
