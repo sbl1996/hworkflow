@@ -14,6 +14,7 @@ from hanser.losses import CrossEntropy
 
 TASK_NAME = os.environ.get("TASK_NAME", "hstudio-default")
 TASK_ID = os.environ.get("TASK_ID", 0)
+WORKER_ID = os.environ.get("WORKER_ID", 0)
 
 TRAIN_RES = 224
 
@@ -35,8 +36,8 @@ batch_size = 1024
 eval_batch_size = 128
 
 # CHANGE THIS
-train_files = ["train-%05d-of-01024" % i for i in range(64)]
-eval_files = ["validation-%05d-of-00128" % i for i in range(4)]
+train_files = [f"{os.getenv('GCS_BUCKET')}/ImageNet/train-%05d-of-01024" % i for i in range(64)]
+eval_files = [f"{os.getenv('GCS_BUCKET')}/ImageNet/validation-%05d-of-00128" % i for i in range(4)]
 # CHANGE THIS
 
 ds_train, ds_eval, steps_per_epoch, eval_steps = make_imagenet_dataset(
@@ -70,7 +71,8 @@ eval_metrics = {
 learner = SuperLearner(
     model, criterion, optimizer,
     train_metrics=train_metrics, eval_metrics=eval_metrics,
-    work_dir=f"./drive/MyDrive/models/{TASK_NAME}-{TASK_ID}")
+    work_dir=f"./drive/MyDrive/models/{TASK_NAME}-{TASK_ID}-{WORKER_ID}")
+
 learner.load(miss_ok=True)
 
 learner.fit(ds_train, epochs, ds_eval, val_freq=1,
