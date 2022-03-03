@@ -1,5 +1,5 @@
 from hworkflow.v2.project import Project
-from hworkflow.v2.imagenet.parse import parse_imagenet_log
+from hworkflow.v2.projects.imagenet.parse import parse_imagenet_log
 
 
 def parse_fn(content):
