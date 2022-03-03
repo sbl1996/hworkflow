@@ -7,7 +7,6 @@ class COCODet(Project):
     update_methods = ["A", "A", "W"]
     commit_range = 'R'
     dep_repo = "hanser"
-    log_suffix1 = False
 
     def parse_log(self, content):
         r"""

@@ -6,7 +6,6 @@ class ImageNet(Project):
     sheet_ranges = ["L", "M", "N", "O"]
     update_methods = ["A", "A", "A", "W"]
     commit_range = 'Q'
-    log_suffix1 = False
     dep_repo = "hanser"
 
     def parse_log(self, content):

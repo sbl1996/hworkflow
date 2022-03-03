@@ -9,7 +9,7 @@ class Project:
 
     sheet_ranges: List[str]
     update_methods: List[str]
-    log_suffix1: bool = True
+    log_suffix1: bool = False
     commit_range: Optional[str] = None
     dep_repo: str
 
