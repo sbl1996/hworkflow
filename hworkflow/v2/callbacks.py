@@ -44,6 +44,30 @@ class CleanLog(Callback):
         write_lines(lines, log_file)
 
 
+class ParseLog(Callback):
+
+    def __init__(self, parse_fn):
+        r"""
+        Examples::
+            >>> cb = ParseLog(parse_fn)
+            >>> context = {'log_file': log_file}
+            >>> cb.transform(context)
+            >>> assert context['parse_result'] == ["77.24", "93.46", "1.9508", "21:39:46\n\n324.5"]
+        """
+        self.parse_fn = parse_fn
+
+    def requires(self):
+        return ['log_file']
+
+    def produces(self):
+        return ['parse_result']
+
+    def transform(self, context):
+        log_file = context['log_file']
+        result = self.parse_fn(read_text(log_file))
+        context['parse_result'] = result
+
+
 class GetDependentRepoCommit(Callback):
 
     def __init__(self, dep_repo):
