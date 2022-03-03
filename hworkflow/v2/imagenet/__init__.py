@@ -50,7 +50,7 @@ class ImageNet(Runner):
             ParseImageNetLog(),
             GetDependentRepoCommit(dep_repo),
             UpdateSheet(sheet, sheet_ranges, update_methods, commit_range),
-            RenameLogWithSeq(log_suffix1=False),
+            RenameLogWithSeq(suffix1=False),
             PushLogToGitHub(github, retry_interval=retry_interval),
         ]
 

@@ -51,7 +51,7 @@ class CIFAR(Runner):
             ParseCIFARLog(),
             GetDependentRepoCommit(dep_repo),
             UpdateSheet(sheet, sheet_ranges, update_methods, commit_range),
-            RenameLogWithSeq(log_suffix1=True),
+            RenameLogWithSeq(suffix1=True),
             PushLogToGitHub(github, retry_interval=retry_interval),
         ]
 

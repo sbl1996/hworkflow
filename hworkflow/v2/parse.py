@@ -94,7 +94,7 @@ def parse_log(content, key, mode='all'):
     train_start, train_metrics, valid_metrics = _parse(content)
     epoch_train_time = estimate_epoch_train_time(train_metrics['time'], valid_metrics['time'])
     total_cost = timedelta(seconds=dtime(valid_metrics['time'][-1], train_start).seconds)
-    main_valid_metrics = valid_metrics[args.key] * 100
+    main_valid_metrics = valid_metrics[key] * 100
     train_losses = train_metrics['loss']
 
     final_metric = main_valid_metrics[-1]

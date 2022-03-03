@@ -51,7 +51,7 @@ class VOCDet(Runner):
             ParseLog(),
             GetDependentRepoCommit(dep_repo),
             UpdateSheet(sheet, sheet_ranges, update_methods, commit_range, sub_sheet),
-            RenameLogWithSeq(log_suffix1=False),
+            RenameLogWithSeq(suffix1=False),
             PushLogToGitHub(github, retry_interval=retry_interval),
         ]
 
