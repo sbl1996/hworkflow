@@ -7,7 +7,6 @@ from hworkflow.sheets import GoogleSheet
 
 class Project:
 
-    parse_fn: Callable[[str], List[str]]
     sheet_ranges: List[str]
     update_methods: List[str]
     log_suffix1: bool = True
@@ -24,12 +23,15 @@ class Project:
 
         self._callbacks = [
             CleanLog(),
-            ParseLog(lambda x: self.parse_fn(x)),
+            ParseLog(self.parse_log),
             GetDependentRepoCommit(self.dep_repo),
             UpdateSheet(self.sheet, self.sheet_ranges, self.update_methods, self.commit_range, sub_sheet),
             RenameLogWithSeq(suffix1=self.log_suffix1),
             PushLogToGitHub(self.github, retry_interval=retry_interval),
         ]
+
+    def parse_log(self, content):
+        raise NotImplemented
 
     def run_retry(self, row, max_retry=10):
         self.runner.run(row, log_file="train.log", max_retry=max_retry, callbacks=self._callbacks)
