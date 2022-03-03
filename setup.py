@@ -17,6 +17,9 @@ REQUIRED = [
     "PyGithub",
     "hhutil",
     "python-dateutil",
+    "numpy",
+    "pandas",
+    "toolz",
 ]
 
 
@@ -29,7 +32,7 @@ except FileNotFoundError:
     long_description = DESCRIPTION
 
 about = {}
-if not VERSION:
+if VERSION is None:
     with open(os.path.join(here, IMPORT_NAME, '_version.py')) as f:
         exec(f.read(), about)
 else:

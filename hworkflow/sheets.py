@@ -86,7 +86,7 @@ class GoogleSheet:
                 spreadsheetId=self.spreadsheet_id, body=body).execute()
 
 
-    def append_result(self, row, ranges, result, update_methods):
+    def append_result(self, row, ranges, result, update_methods, sheet='Sheet1'):
         r"""
         Examples::
             >>> result = ['80.22', '94.65', '2.6662', '14:50:13\n\n266.3', '5a2f14f']
@@ -97,9 +97,9 @@ class GoogleSheet:
         """
         assert len(ranges) == len(result) == len(update_methods)
         ranges = [f"{r}{row}" for r in ranges]
-        results = self.read_values(ranges)
+        results = self.read_values(ranges, sheet=sheet)
         results = update_results(results, result, update_methods)
-        self.update_values(ranges, results)
+        self.update_values(ranges, results, sheet=sheet)
         if 'A' not in update_methods:
             seq = 1
         else:
