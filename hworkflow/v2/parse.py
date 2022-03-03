@@ -1,4 +1,3 @@
-import argparse
 import re
 
 import numpy as np
@@ -80,12 +79,6 @@ def _parse(content):
             valid_ends[i] = train_ends[i]
 
     return train_start, train_metrics, valid_metrics
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-k','--key', type=str, required=True)
-parser.add_argument('-f','--log', type=str, help='Log file', required=True)
-parser.add_argument('--mode', choices=["final", "max", "all"], default='all')
-args = parser.parse_args()
 
 
 def estimate_epoch_train_time(train_ends, valid_ends):
