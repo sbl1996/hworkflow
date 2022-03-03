@@ -24,7 +24,7 @@ class Project:
 
         self._callbacks = [
             CleanLog(),
-            ParseLog(self.parse_fn),
+            ParseLog(lambda x: self.parse_fn(x)),
             GetDependentRepoCommit(self.dep_repo),
             UpdateSheet(self.sheet, self.sheet_ranges, self.update_methods, self.commit_range, sub_sheet),
             RenameLogWithSeq(suffix1=self.log_suffix1),
