@@ -20,7 +20,7 @@ class Project:
         self.sheet = GoogleSheet(sheet_id, secret_file, token_file)
 
         env_vars = {**env_vars, "WORKER_ID": worker_id, "TASK_NAME": name}
-        self.runner = Runner(work_dir, retry_interval, env_vars)
+        self.runner = Runner(work_dir, retry_interval, **env_vars)
 
         self._callbacks = [
             CleanLog(),
@@ -30,8 +30,6 @@ class Project:
             RenameLogWithSeq(suffix1=self.log_suffix1),
             PushLogToGitHub(self.github, retry_interval=retry_interval),
         ]
-
-        super().__init__(work_dir, retry_interval, **env_vars)
 
     def run_retry(self, row, max_retry=10):
         self.runner.run(row, log_file="train.log", max_retry=max_retry, callbacks=self._callbacks)
