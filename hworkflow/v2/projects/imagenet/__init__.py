@@ -15,6 +15,6 @@ class ImageNet(Project):
             >>> ["77.24", "93.46", "1.9508", "21:39:46\n\n324.5"]
         """
         result = parse_imagenet_log(content)
-        result = [f.format(r) for f, r in zip(["%.2f", "%.2f", ".4f", "%s", "%.1f"], result)]
+        result = [f % r for f, r in zip(["%.2f", "%.2f", ".4f", "%s", "%.1f"], result)]
         result = result[:-2] + [result[-2] + "\n\n" + result[-1]]
         return result
