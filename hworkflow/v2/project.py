@@ -1,4 +1,7 @@
-from typing import List, Optional, Callable
+from typing import List, Optional
+
+from hhutil.io import fmt_path
+
 from hworkflow.v2.callbacks import CleanLog, ParseLog, GetDependentRepoCommit, UpdateSheet, RenameLogWithSeq, PushLogToGitHub
 from hworkflow.v2.runner import Runner
 from hworkflow.github import Github
@@ -35,6 +38,17 @@ class Project:
 
     def run_retry(self, row, max_retry=10):
         self.runner.run(row, log_file="train.log", max_retry=max_retry, callbacks=self._callbacks)
+
+    def sync_result(self, row, log_file):
+        log_file = fmt_path(log_file)
+        context = {
+            'task_id': row,
+            'log_file': log_file,
+        }
+        for c in self._callbacks:
+            c.transform(context)
+        print(f"{context['task_id']}-{context['sheet_seq']}")
+
 
     def fetch_code(self, row):
         content = self.github.fetch(f"code/{row}.py")
