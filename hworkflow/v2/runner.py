@@ -54,6 +54,7 @@ class Runner:
                 for c in callbacks:
                     c.transform(self._context)
                 print(f"{self._context['task_id']}-{self._context['sheet_seq']}")
+                break
             else:
                 error_log = read_text(log_file)
 
