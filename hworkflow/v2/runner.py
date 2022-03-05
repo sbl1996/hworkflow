@@ -40,6 +40,8 @@ class Runner:
 
         if log_file is None:
             log_file = self.work_dir / f"{task_id}.log"
+        else:
+            log_file = fmt_path(log_file)
 
         retry = 0
         while True:
