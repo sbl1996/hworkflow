@@ -47,11 +47,15 @@ class Runner:
         while True:
             is_sleeping = False
             proc = self.run_script(task_id, log_file)
+            poll_count = 0
             try:
                 poll_interval = 10
                 mtime = log_file.stat().st_mtime
                 while proc.poll() is None:
                     time.sleep(poll_interval)
+                    poll_count += 1
+                    if poll_count * poll_interval < log_timeout:
+                        continue
                     last_mtime = mtime
                     mtime = log_file.stat().st_mtime
                     if log_timeout is not None and mtime - last_mtime > log_timeout:
