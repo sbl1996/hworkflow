@@ -61,7 +61,7 @@ class Runner:
                     last_mtime = mtime
                     mtime = log_file.stat().st_mtime
                     if log_timeout is not None and mtime - last_mtime > log_timeout:
-                        print(f"${time_now()} Detect sleeping, kill it")
+                        print(f"{time_now()} Detect sleeping, kill it")
                         proc.kill()
                         is_sleeping = True
                         break
