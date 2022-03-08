@@ -2,7 +2,7 @@ import sys
 import time
 import subprocess
 
-from hhutil.io import fmt_path, read_text
+from hhutil.io import fmt_path, read_text, time_now
 from hworkflow.v2.callbacks import validate_callbacks
 
 
@@ -55,6 +55,7 @@ class Runner:
                     last_mtime = mtime
                     mtime = log_file.stat().st_mtime
                     if log_timeout is not None and mtime - last_mtime > log_timeout:
+                        print(f"${time_now()} Detect sleeping, kill it")
                         proc.kill()
                         is_sleeping = True
                         break
