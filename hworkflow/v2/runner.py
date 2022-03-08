@@ -50,12 +50,14 @@ class Runner:
             poll_count = 0
             try:
                 poll_interval = 10
-                mtime = log_file.stat().st_mtime
+                mtime = None
                 while proc.poll() is None:
                     time.sleep(poll_interval)
                     poll_count += 1
                     if poll_count * poll_interval < log_timeout:
                         continue
+                    if mtime is None:
+                        mtime = log_file.stat().st_mtime
                     last_mtime = mtime
                     mtime = log_file.stat().st_mtime
                     if log_timeout is not None and mtime - last_mtime > log_timeout:
