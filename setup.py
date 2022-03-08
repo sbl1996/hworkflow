@@ -20,6 +20,7 @@ REQUIRED = [
     "numpy",
     "pandas",
     "toolz",
+    "psutil"
 ]
 
 

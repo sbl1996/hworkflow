@@ -1,6 +1,7 @@
 import sys
 import time
 import subprocess
+import psutil
 
 from hhutil.io import fmt_path, read_text
 from hworkflow.v2.callbacks import validate_callbacks
@@ -31,7 +32,7 @@ class Runner:
         fp = self.work_dir / f"{task_id}.py"
         cmd = f"{env_prefix} {python_exe} -u {fp} > {log_file} 2>&1"
 
-        p = subprocess.run(cmd, shell=True)
+        p = subprocess.Popen(cmd, shell=True)
         return p
 
     def run(self, task_id, log_file=None, max_retry=10, callbacks=()):
@@ -45,8 +46,53 @@ class Runner:
 
         retry = 0
         while True:
-            p = self.run_script(task_id, log_file)
-            if p.returncode == 0:
+            is_sleeping = False
+            proc = self.run_script(task_id, log_file)
+            try:
+                while proc.poll() is None:
+                    time.sleep(10)
+                    p = [p for p in psutil.process_iter() if p.pid == proc.pid][0]
+                    if p.status() == 'sleeping':
+                        is_sleeping = True
+                        proc.kill()
+                        break
+            except KeyboardInterrupt as e:
+                proc.kill()
+                raise e
+
+            if proc.returncode != 0:
+                if is_sleeping:
+                    retry += 1
+                    if retry > max_retry:
+                        raise RuntimeError("Failed to run task {} after {} retries".format(task_id, max_retry))
+                    time.sleep(self.retry_interval)
+                    continue
+                else:
+                    error_log = read_text(log_file)
+
+                    network_erros = [
+                        "Socket closed",
+                        "Connection reset by peer",
+                    ]
+
+                    functional_errors = [
+                        "Stage end",
+                        "Infinite encountered",
+                    ]
+                    # TODO: Connection timed out. The process will not return and block forever.
+                    possible_errors = network_erros + functional_errors
+
+                    if any(e in error_log for e in possible_errors):
+                        retry += 1
+                        if retry > max_retry:
+                            raise RuntimeError("Failed to run task {} after {} retries".format(task_id, max_retry))
+                        time.sleep(self.retry_interval)
+                        continue
+                    else:
+                        # Unknown error, left to user
+                        print(error_log)
+                        break
+            else:
                 self._context = {
                     'task_id': task_id,
                     'log_file': log_file,
@@ -55,29 +101,3 @@ class Runner:
                     c.transform(self._context)
                 print(f"{self._context['task_id']}-{self._context['sheet_seq']}")
                 break
-            else:
-                error_log = read_text(log_file)
-
-                network_erros = [
-                    "Socket closed",
-                    "Connection reset by peer",
-                ]
-
-                functional_errors = [
-                    "Stage end",
-                    "Infinite encountered",
-                ]
-                # TODO: Connection timed out or CPU hang (usage 0%).
-                #       The process will not return and block forever.
-                possible_errors = network_erros + functional_errors
-
-                if any(e in error_log for e in possible_errors):
-                    retry += 1
-                    if retry > max_retry:
-                        raise RuntimeError("Failed to run task {} after {} retries".format(task_id, max_retry))
-                    time.sleep(self.retry_interval)
-                    continue
-                else:
-                    # Unknown error, left to user
-                    print(error_log)
-                    break
