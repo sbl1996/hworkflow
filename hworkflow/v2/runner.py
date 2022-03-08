@@ -30,7 +30,7 @@ class Runner:
         python_exe = self._python_exe
         env_prefix = " ".join([f"{k}={v}" for k, v in envs.items()])
         fp = self.work_dir / f"{task_id}.py"
-        cmd = f"{env_prefix} {python_exe} -u {fp} > {log_file} 2>&1"
+        cmd = f"{env_prefix} exec {python_exe} -u {fp} > {log_file} 2>&1"
 
         p = subprocess.Popen(cmd, shell=True)
         return p
@@ -52,7 +52,7 @@ class Runner:
                 while proc.poll() is None:
                     time.sleep(10)
                     p = [p for p in psutil.process_iter() if p.pid == proc.pid][0]
-                    print(p.status())
+                    print(p.status(), p.cpu_percent())
                     # if p.status() == 'sleeping':
                     #     is_sleeping = True
                     #     proc.kill()
