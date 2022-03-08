@@ -61,7 +61,9 @@ class Runner:
                 proc.kill()
                 raise e
             except Exception as e:
+                proc.kill()
                 print(e)
+                exit(1)
 
             if proc.returncode != 0:
                 if is_sleeping:
