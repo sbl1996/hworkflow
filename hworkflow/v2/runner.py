@@ -53,13 +53,15 @@ class Runner:
                     time.sleep(10)
                     p = [p for p in psutil.process_iter() if p.pid == proc.pid][0]
                     print(p.status())
-                    if p.status() == 'sleeping':
-                        is_sleeping = True
-                        proc.kill()
-                        break
+                    # if p.status() == 'sleeping':
+                    #     is_sleeping = True
+                    #     proc.kill()
+                    #     break
             except KeyboardInterrupt as e:
                 proc.kill()
                 raise e
+            except Exception as e:
+                print(e)
 
             if proc.returncode != 0:
                 if is_sleeping:
