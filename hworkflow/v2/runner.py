@@ -52,6 +52,7 @@ class Runner:
                 while proc.poll() is None:
                     time.sleep(10)
                     p = [p for p in psutil.process_iter() if p.pid == proc.pid][0]
+                    print(p.status())
                     if p.status() == 'sleeping':
                         is_sleeping = True
                         proc.kill()
