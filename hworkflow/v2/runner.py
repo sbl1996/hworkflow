@@ -54,15 +54,16 @@ class Runner:
                 while proc.poll() is None:
                     time.sleep(poll_interval)
                     poll_count += 1
-                    if poll_count * poll_interval < log_timeout:
-                        # warmup because first epoch costs much more time
-                        continue
-                    mtime = log_file.stat().st_mtime
-                    if log_timeout is not None and  datetime.now().timestamp() - mtime > log_timeout:
-                        print(f"{time_now()} Detect sleeping, kill it")
-                        proc.kill()
-                        is_sleeping = True
-                        break
+                    if log_timeout is not None:
+                        if poll_count * poll_interval < log_timeout:
+                            # warmup because first epoch costs much more time
+                            continue
+                        mtime = log_file.stat().st_mtime
+                        if datetime.now().timestamp() - mtime > log_timeout:
+                            print(f"{time_now()} Detect sleeping, kill it")
+                            proc.kill()
+                            is_sleeping = True
+                            break
             except KeyboardInterrupt as e:
                 proc.kill()
                 raise e
