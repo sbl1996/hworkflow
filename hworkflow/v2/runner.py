@@ -1,6 +1,7 @@
 import sys
 import time
 import subprocess
+from datetime import datetime
 
 from hhutil.io import fmt_path, read_text, time_now
 from hworkflow.v2.callbacks import validate_callbacks
@@ -50,17 +51,14 @@ class Runner:
             poll_count = 0
             try:
                 poll_interval = 10
-                mtime = None
                 while proc.poll() is None:
                     time.sleep(poll_interval)
                     poll_count += 1
                     if poll_count * poll_interval < log_timeout:
+                        # warmup because first epoch costs much more time
                         continue
-                    if mtime is None:
-                        mtime = log_file.stat().st_mtime
-                    last_mtime = mtime
                     mtime = log_file.stat().st_mtime
-                    if log_timeout is not None and mtime - last_mtime > log_timeout:
+                    if log_timeout is not None and  datetime.now().timestamp() - mtime > log_timeout:
                         print(f"{time_now()} Detect sleeping, kill it")
                         proc.kill()
                         is_sleeping = True
