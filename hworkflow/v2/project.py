@@ -36,8 +36,8 @@ class Project:
     def parse_log(self, content):
         raise NotImplemented
 
-    def run_retry(self, row, max_retry=10):
-        self.runner.run(row, log_file="train.log", max_retry=max_retry, callbacks=self._callbacks)
+    def run_retry(self, row, max_retry=10, log_timeout=None):
+        self.runner.run(row, log_file="train.log", max_retry=max_retry, callbacks=self._callbacks, log_timeout=log_timeout)
 
     def sync_result(self, row, log_file):
         log_file = fmt_path(log_file)

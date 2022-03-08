@@ -1,7 +1,6 @@
 import sys
 import time
 import subprocess
-import psutil
 
 from hhutil.io import fmt_path, read_text
 from hworkflow.v2.callbacks import validate_callbacks
@@ -35,7 +34,7 @@ class Runner:
         p = subprocess.Popen(cmd, shell=True)
         return p
 
-    def run(self, task_id, log_file=None, max_retry=10, callbacks=()):
+    def run(self, task_id, log_file=None, max_retry=10, callbacks=(), log_timeout=None):
         self.check_code(task_id)
         validate_callbacks(callbacks, ['task_id', 'log_file'])
 
@@ -49,14 +48,16 @@ class Runner:
             is_sleeping = False
             proc = self.run_script(task_id, log_file)
             try:
+                poll_interval = 10
+                mtime = log_file.stat().st_mtime
                 while proc.poll() is None:
-                    time.sleep(10)
-                    p = [p for p in psutil.process_iter() if p.pid == proc.pid][0]
-                    print(p.status(), p.cpu_percent())
-                    # if p.status() == 'sleeping':
-                    #     is_sleeping = True
-                    #     proc.kill()
-                    #     break
+                    time.sleep(poll_interval)
+                    last_mtime = mtime
+                    mtime = log_file.stat().st_mtime
+                    if log_timeout is not None and mtime - last_mtime > log_timeout:
+                        proc.kill()
+                        is_sleeping = True
+                        break
             except KeyboardInterrupt as e:
                 proc.kill()
                 raise e
