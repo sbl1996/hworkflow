@@ -111,5 +111,6 @@ class Runner:
                 }
                 for c in callbacks:
                     c.transform(self._context)
-                print(f"{self._context['task_id']}-{self._context['sheet_seq']}")
+                if 'sheet_seq' in self._context:
+                    print(f"{self._context['task_id']}-{self._context['sheet_seq']}")
                 break
