@@ -113,4 +113,6 @@ class Runner:
                     c.transform(self._context)
                 if 'sheet_seq' in self._context:
                     print(f"{self._context['task_id']}-{self._context['sheet_seq']}")
+                else:
+                    print(f"{self._context['task_id']}")
                 break
